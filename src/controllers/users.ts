@@ -1,47 +1,47 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/user';
+
 const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
 
-export const getUser = (req: Request, res: Response, next: NextFunction) => {
-  return User.find({})
-    .then((user) => res.send({ user }))
-    .catch(next);
-}
+export const getUser = (req: Request, res: Response, next: NextFunction) => User.find({})
+  .then((user) => res.send({ user }))
+  .catch(next);
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar } = req.body;
-  return User.create({ name: name, about: about, avatar: avatar })
+  return User.create({ name, about, avatar })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(`Неправильный логин или пароль`);
-      }
-      else return next(err)
+        throw new BadRequestError('Неправильный логин или пароль');
+      } else return next(err);
     })
     .catch(next);
-}
+};
 export const findUser = (req: Request, res: Response, next: NextFunction) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
       }
-      return res.send(user)
+      return res.send(user);
     })
 
     .catch(next);
-}
+};
 export const updateUser = (req: any, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id,
+  User.findByIdAndUpdate(
+    req.user._id,
     {
-      name: name,
-      about: about
+      name,
+      about,
     },
     {
       new: true,
-      runValidators: true
-    })
+      runValidators: true,
+    },
+  )
     .then((user) => {
       if (!user) {
         throw new BadRequestError('Пользователя не существует');
@@ -49,17 +49,19 @@ export const updateUser = (req: any, res: Response, next: NextFunction) => {
       return res.send(user);
     })
     .catch(next);
-}
+};
 export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id,
+  User.findByIdAndUpdate(
+    req.user._id,
     {
-      avatar: avatar
+      avatar,
     },
     {
       new: true,
-      runValidators: true
-    })
+      runValidators: true,
+    },
+  )
     .then((user) => {
       if (!user) {
         throw new BadRequestError('Пользователя не существует');
@@ -67,5 +69,4 @@ export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
       return res.send(user);
     })
     .catch(next);
-}
-
+};
