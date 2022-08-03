@@ -1,25 +1,37 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import User from '../models/user';
+const NotFoundError = require('../errors/notFoundError');
+const BadRequestError = require('../errors/badRequestError');
 
-export const getUser = (req: Request, res: Response) => {
+export const getUser = (req: Request, res: Response, next: NextFunction) => {
   return User.find({})
     .then((user) => res.send({ user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 }
-export const createUser = (req: Request, res: Response) => {
+export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar } = req.body;
   return User.create({ name: name, about: about, avatar: avatar })
     .then((user) => res.send(user))
-    .catch((err) => res.status(500)
-    .send({ message: `Произошла ошибка ${err}` }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError(`Неправильный логин или пароль`);
+      }
+      else return next(err)
+    })
+    .catch(next);
 }
-export const findUser = (req: Request, res: Response) => {
-
+export const findUser = (req: Request, res: Response, next: NextFunction) => {
   User.findById(req.params.userId)
-    .then((user) => res.send({ user: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Нет пользователя с таким id');
+      }
+      return res.send(user)
+    })
+
+    .catch(next);
 }
-export const updateUser = (req: any, res: Response) => {
+export const updateUser = (req: any, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id,
     {
@@ -30,10 +42,15 @@ export const updateUser = (req: any, res: Response) => {
       new: true,
       runValidators: true
     })
-    .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((user) => {
+      if (!user) {
+        throw new BadRequestError('Пользователя не существует');
+      }
+      return res.send(user);
+    })
+    .catch(next);
 }
-export const updateAvatar = (req: any, res: Response) => {
+export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id,
     {
@@ -43,7 +60,12 @@ export const updateAvatar = (req: any, res: Response) => {
       new: true,
       runValidators: true
     })
-    .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((user) => {
+      if (!user) {
+        throw new BadRequestError('Пользователя не существует');
+      }
+      return res.send(user);
+    })
+    .catch(next);
 }
 

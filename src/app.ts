@@ -1,21 +1,21 @@
-import express, { Request, Response, RequestHandler } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import cardsRouter from './routes/cards';
 import usersRouter from './routes/users';
+import {UNKNOWN_ERROR} from './constants/ErrorCode';
+import {IError} from './types/errors';
 const { PORT = 3000 } = process.env;
+const notFoundError = require('./errors/notFoundError');
 export interface SessionRequest extends Request {
-  user?:{
+  user?: {
     _id: string;
   }
-}
-interface IError {
-  status?: number;
 }
 mongoose.connect('mongodb://localhost:27017/mestodb');
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use((req:SessionRequest, res:Response, next) => {
+//app.use(express.urlencoded({ extended: true }));
+app.use((req: SessionRequest, res: Response, next: NextFunction) => {
   req.user = {
     _id: '62e807cfb4b44dff9df8d6aa'
   };
@@ -25,9 +25,20 @@ app.use((req:SessionRequest, res:Response, next) => {
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use((err:IError, req:Request, res:Response, next:RequestHandler) => {
-
-  res.status(500).send({ message: 'На сервере произошла ошибка' });
+app.all('/', () => {
+  throw new notFoundError('Запрашиваемые данные отсутствуют');
+});
+app.use((
+  err: IError,
+  req: Request,
+  res: Response,
+  next: NextFunction) => {
+  const { statusCode = UNKNOWN_ERROR, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === UNKNOWN_ERROR
+      ? 'На сервере произошла ошибка'
+      : message
+  });
 });
 
 app.listen(PORT, () => {
