@@ -25,6 +25,12 @@ export const findUser = (req: Request, res: Response, next: NextFunction) => {
       }
       return res.send(user);
     })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Неправильный id');
+      }
+      return next(err);
+    })
 
     .catch(next);
 };
@@ -47,6 +53,12 @@ export const updateUser = (req: any, res: Response, next: NextFunction) => {
       }
       return res.send(user);
     })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Неправильный id');
+      }
+      return next(err);
+    })
     .catch(next);
 };
 export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
@@ -66,6 +78,12 @@ export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
         throw new BadRequestError('Пользователя не существует');
       }
       return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Неправильный id');
+      }
+      return next(err);
     })
     .catch(next);
 };

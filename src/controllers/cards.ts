@@ -24,17 +24,17 @@ export const createCard = (req: any, res: Response, next: NextFunction) => {
 };
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        throw new BadRequestError('Неправильный id карточки');
-      }
-      return next(err);
-    })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Нет карты с указанным id');
       }
       res.send(card);
+    })
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        throw new BadRequestError('Неправильный id карточки');
+      }
+      return next(err);
     })
     .catch(next);
 };
@@ -48,10 +48,10 @@ export const likeCard = (req: any, res: Response, next: NextFunction) => {
     { new: true },
   )
     .then((card) => {
-      res.send(card);
       if (!card) {
         throw new BadRequestError('Неправильный id');
       }
+      res.send(card);
     })
     .catch(next);
 };
@@ -62,10 +62,10 @@ export const dislikeCard = (req: any, res: Response, next: NextFunction) => {
     { new: true },
   )
     .then((card) => {
-      res.send(card);
       if (!card) {
         throw new BadRequestError('Неправильный id');
       }
+      res.send(card);
     })
     .catch(next);
 };
