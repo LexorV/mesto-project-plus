@@ -13,16 +13,23 @@ export const createCard = (req: any, res: Response, next: NextFunction) => {
     link,
     owner: req.user._id,
   })
-    .then((card) => res.send({ card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Неправильно заполнено поле');
-      } else return next(err);
+      }
+      return next(err);
     })
+    .then((card) => res.send({ card }))
     .catch(next);
 };
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        throw new BadRequestError('Неправильный id карточки');
+      }
+      return next(err);
+    })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Нет карты с указанным id');

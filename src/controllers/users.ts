@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/user';
-
-const NotFoundError = require('../errors/notFoundError');
-const BadRequestError = require('../errors/badRequestError');
+import NotFoundError from '../errors/notFoundError';
+import BadRequestError from '../errors/badRequestError';
 
 export const getUser = (req: Request, res: Response, next: NextFunction) => User.find({})
   .then((user) => res.send({ user }))
