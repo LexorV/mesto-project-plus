@@ -53,6 +53,12 @@ export const likeCard = (req: any, res: Response, next: NextFunction) => {
       }
       res.send(card);
     })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Неправильный id');
+      }
+      return next(err);
+    })
     .catch(next);
 };
 export const dislikeCard = (req: any, res: Response, next: NextFunction) => {
@@ -66,6 +72,12 @@ export const dislikeCard = (req: any, res: Response, next: NextFunction) => {
         throw new BadRequestError('Неправильный id');
       }
       res.send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Неправильный id');
+      }
+      return next(err);
     })
     .catch(next);
 };
