@@ -14,6 +14,7 @@ const userShema = new Schema<IUser>({
     required: true,
     maxLength: 30,
     minLength: 2,
+    default: 'Жак-Ив Кусто',
   },
   email: {
     type: String,
@@ -41,10 +42,12 @@ const userShema = new Schema<IUser>({
     required: true,
     maxLength: 200,
     minLength: 2,
+    default: 'Исследователь',
   },
   avatar: {
     type: String,
     required: true,
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
 });
 export default model<IUser>('user', userShema);
