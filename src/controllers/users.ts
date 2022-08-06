@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/user';
 import NotFoundError from '../errors/notFoundError';
@@ -96,4 +97,34 @@ export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
       return next(err);
     })
     .catch(next);
+};
+export const login = (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        throw new Error('Неправильные почта или пароль');
+      }
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          throw new Error('Неправильные почта или пароль');
+        }
+        return user;
+      });
+    })
+    .then((user) => {
+      res.send({
+        token: jwt.sign(
+          { _id: user._id },
+          'super-strong-secret',
+          { expiresIn: '7d' },
+        ),
+      });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
 };
