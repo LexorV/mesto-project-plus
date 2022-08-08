@@ -5,6 +5,11 @@ import usersRouter from './routes/users';
 import { UNKNOWN_ERROR } from './constants/ErrorCode';
 import { IError } from './types/errors';
 import NotFoundError from './errors/notFoundError';
+import auth from './middlewares/auth';
+import {
+  createUser,
+  login,
+} from './controllers/users';
 
 const { PORT = 3000 } = process.env;
 export interface SessionRequest extends Request {
@@ -24,11 +29,14 @@ app.use((req: SessionRequest, res: Response, next: NextFunction) => {
   next();
 });
 
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.all('/', () => {
   throw new NotFoundError('Запрашиваемые данные отсутствуют');
 });
+app.use(auth);
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
 app.use((
   err: IError,
   req: Request,

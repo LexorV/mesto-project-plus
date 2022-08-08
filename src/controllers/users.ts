@@ -5,7 +5,7 @@ import User from '../models/user';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
 
-export const getUser = (req: Request, res: Response, next: NextFunction) => User.find({})
+export const getUsers = (req: Request, res: Response, next: NextFunction) => User.find({})
   .then((user) => res.send({ user }))
   .catch(next);
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
@@ -127,4 +127,22 @@ export const login = (req: Request, res: Response) => {
         .status(401)
         .send({ message: err.message });
     });
+};
+
+export const getUser = (req: any, res: Response, next: NextFunction) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Нет пользователя с таким id');
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Неправильный id');
+      }
+      return next(err);
+    })
+
+    .catch(next);
 };
