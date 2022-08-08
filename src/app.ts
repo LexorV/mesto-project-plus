@@ -28,13 +28,12 @@ app.use((req: SessionRequest, res: Response, next: NextFunction) => {
 
   next();
 });
-
 app.post('/signin', login);
 app.post('/signup', createUser);
+app.use(auth);
 app.all('/', () => {
   throw new NotFoundError('Запрашиваемые данные отсутствуют');
 });
-app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use((

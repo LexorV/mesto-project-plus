@@ -23,7 +23,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Неправильный логин или пароль');
+        throw new BadRequestError(err);
       } else return next(err);
     })
     .catch(next);
