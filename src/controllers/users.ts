@@ -23,8 +23,11 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     }))
     .then((user) => res.send(user))
     .catch((err) => {
+      if (err.code === 11000) {
+        throw new ConflictNameError('Такое Email уже зарегистрирован');
+      }
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(err);
+        throw new BadRequestError(err.message);
       } else return next(err);
     })
     .catch(next);
@@ -38,9 +41,6 @@ export const findUser = (req: Request, res: Response, next: NextFunction) => {
       return res.send(user);
     })
     .catch((err) => {
-      if (err.code === 11000) {
-        throw new ConflictNameError('Такое Email уже зарегистрирован');
-      }
       if (err.name === 'CastError') {
         throw new BadRequestError('Неправильный id');
       }
@@ -102,7 +102,7 @@ export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
     })
     .catch(next);
 };
-export const login = (req: Request, res: Response) => {
+export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
   User.findOne({ email }).select('+password')
@@ -127,10 +127,9 @@ export const login = (req: Request, res: Response) => {
       });
     })
     .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+      throw new ConflictNameError(err.message);
+    })
+    .catch(next);
 };
 
 export const getUser = (req: any, res: Response, next: NextFunction) => {

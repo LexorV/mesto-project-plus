@@ -48,6 +48,19 @@ const userShema = new Schema<IUser>({
   avatar: {
     type: String,
     required: true,
+    validate: {
+      validator(e:string) {
+        return validator.isURL(
+          e,
+          {
+            protocols: ['http', 'https'],
+            require_tld: true,
+            require_protocol: true,
+          },
+        );
+      },
+    },
+    message: 'Поле аватара заполнено неправильно',
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
 });
