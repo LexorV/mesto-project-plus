@@ -30,6 +30,7 @@ const userShema = new Schema<IUser>({
   password: {
     type: String,
     required: true,
+    select: false,
     validate: {
       validator(e:string) {
         return (/[^a-zA-Z0-9]/.test(e));
