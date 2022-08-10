@@ -6,6 +6,7 @@ import { UNKNOWN_ERROR } from './constants/ErrorCode';
 import { IError } from './types/errors';
 import NotFoundError from './errors/notFoundError';
 import auth from './middlewares/auth';
+import { requestLogger, errorLogger } from './middlewares/logger';
 import {
   createUser,
   login,
@@ -32,6 +33,7 @@ app.use((req: SessionRequest, res: Response, next: NextFunction) => {
 
   next();
 }); */
+app.use(requestLogger);
 app.post('/signin', login);
 app.post('/signup', createUser);
 app.get('/cards', getCards);
@@ -41,6 +43,7 @@ app.all('/', () => {
 });
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+app.use(errorLogger);
 app.use((
   err: IError,
   req: Request,

@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/user';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
+import ConflictNameError from '../errors/confictNameError';
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => User.find({})
   .then((user) => res.send({ user }))
@@ -37,6 +38,9 @@ export const findUser = (req: Request, res: Response, next: NextFunction) => {
       return res.send(user);
     })
     .catch((err) => {
+      if (err.code === 11000) {
+        throw new ConflictNameError('Такое Email уже зарегистрирован');
+      }
       if (err.name === 'CastError') {
         throw new BadRequestError('Неправильный id');
       }
