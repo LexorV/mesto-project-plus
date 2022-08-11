@@ -22,13 +22,20 @@ export const createCard = (req: any, res: Response, next: NextFunction) => {
     .then((card) => res.send({ card }))
     .catch(next);
 };
-export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
-  Card.findByIdAndRemove(req.params.cardId)
+export const deleteCard = (req: any, res: Response, next: NextFunction) => {
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Нет карты с указанным id');
       }
-      res.send(card);
+      if (String(card.owner) !== req.user._id) {
+        throw new BadRequestError('Нельзя удалять чужие карточки');
+      } else {
+        return Card.findByIdAndRemove(req.params.cardId)
+          .then((c) => {
+            res.send(c);
+          });
+      }
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {

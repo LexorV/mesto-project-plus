@@ -121,7 +121,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       res.send({
         token: jwt.sign(
           { _id: user._id },
-          'super-strong-secret',
+          'some-secret-key',
           { expiresIn: '7d' },
         ),
       });
