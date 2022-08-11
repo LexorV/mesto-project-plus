@@ -27,7 +27,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         throw new ConflictNameError('Такое Email уже зарегистрирован');
       }
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(err.message);
+        throw new BadRequestError(err);
       } else return next(err);
     })
     .catch(next);

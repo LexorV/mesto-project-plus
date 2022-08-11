@@ -13,7 +13,7 @@ export default (req: SessionRequest, res: Response, next: NextFunction) => {
   }
 
   const token = authorization.replace('Bearer ', '');
-  let payload = jwt.verify(token, 'some-secret-key');
+  let payload;
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
@@ -21,5 +21,5 @@ export default (req: SessionRequest, res: Response, next: NextFunction) => {
   }
   req.user = payload;
   next();
-  return null;
+  // return null;
 };

@@ -33,7 +33,7 @@ const userShema = new Schema<IUser>({
     select: false,
     validate: {
       validator(e:string) {
-        return (/[^a-zA-Z0-9]/.test(e));
+        return (/(?=.*[a-z])(?=.*[0-9])/.test(e));
       },
     },
     message: 'Введён некоректный пароль',
