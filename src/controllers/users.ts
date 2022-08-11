@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/user';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
-import ConflictNameError from '../errors/confictNameError';
+import AutchErr from '../errors/autchErr';
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => User.find({})
   .then((user) => res.send({ user }))
@@ -24,7 +24,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.code === 11000) {
-        throw new ConflictNameError('Такое Email уже зарегистрирован');
+        throw new AutchErr('Такое Email уже зарегистрирован');
       }
       if (err.name === 'ValidationError') {
         throw new BadRequestError(err);
@@ -127,7 +127,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       });
     })
     .catch((err) => {
-      throw new ConflictNameError(err.message);
+      throw new AutchErr(err.message);
     })
     .catch(next);
 };

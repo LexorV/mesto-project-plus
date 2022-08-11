@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Card from '../models/card';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
+import ConflictDelError from '../errors/conflictDelError';
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => Card.find({})
   .then((card) => res.send(card))
@@ -29,7 +30,7 @@ export const deleteCard = (req: any, res: Response, next: NextFunction) => {
         throw new NotFoundError('Нет карты с указанным id');
       }
       if (String(card.owner) !== req.user._id) {
-        throw new BadRequestError('Нельзя удалять чужие карточки');
+        throw new ConflictDelError('Нельзя удалять чужие карточки');
       } else {
         return Card.findByIdAndRemove(req.params.cardId)
           .then((c) => {
