@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Card from '../models/card';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
+import ConflictDelError from '../errors/conflictDelError';
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => Card.find({})
   .then((card) => res.send(card))
@@ -22,13 +23,20 @@ export const createCard = (req: any, res: Response, next: NextFunction) => {
     .then((card) => res.send({ card }))
     .catch(next);
 };
-export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
-  Card.findByIdAndRemove(req.params.cardId)
+export const deleteCard = (req: any, res: Response, next: NextFunction) => {
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Нет карты с указанным id');
       }
-      res.send(card);
+      if (String(card.owner) !== req.user._id) {
+        throw new ConflictDelError('Нельзя удалять чужие карточки');
+      } else {
+        return Card.findByIdAndRemove(req.params.cardId)
+          .then((c) => {
+            res.send(c);
+          });
+      }
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
