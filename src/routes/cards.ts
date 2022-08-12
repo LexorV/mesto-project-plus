@@ -15,7 +15,10 @@ router.get('/cards', getCards);
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(UrlPicture).message('Некорректно указан url'),
+    link: Joi.string()
+      .required()
+      .pattern(UrlPicture)
+      .message('Некорректно указан url'),
   }),
 }), createCard);
 router.delete('/:cardId', celebrate({

@@ -15,11 +15,6 @@ import {
 import { UrlPicture } from './constants/RegularConst';
 
 const { PORT = 3000 } = process.env;
-export interface SessionRequest extends Request {
-  user?: {
-    _id: string;
-  }
-}
 mongoose.connect('mongodb://localhost:27017/mestodb');
 const app = express();
 app.use(express.json());
