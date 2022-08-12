@@ -59,8 +59,8 @@ const userShema = new Schema<IUser>({
           },
         );
       },
+      message: 'Поле аватара заполнено неправильно',
     },
-    message: 'Поле аватара заполнено неправильно',
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
 });

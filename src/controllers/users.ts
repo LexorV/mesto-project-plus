@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/user';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
-import AutchErr from '../errors/autchErr';
+import RepeatedNameError from '../errors/repeatedNameError';
 import { SessionRequest } from '../types/request';
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => User.find({})
@@ -25,11 +25,12 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.code === 11000) {
-        throw new AutchErr('Такое Email уже зарегистрирован');
+        throw new RepeatedNameError('Такой Email уже зарегистрирован');
       }
       if (err.name === 'ValidationError') {
         throw new BadRequestError(err);
-      } else return next(err);
+      }
+      return next(err);
     })
     .catch(next);
 };

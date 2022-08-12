@@ -12,9 +12,7 @@ import {
   createUser,
   login,
 } from './controllers/users';
-import {
-  getCards,
-} from './controllers/cards';
+import { UrlPicture } from './constants/RegularConst';
 
 const { PORT = 3000 } = process.env;
 export interface SessionRequest extends Request {
@@ -40,10 +38,9 @@ app.post('/signup', celebrate({
       .message('Некоректный пароль'),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/).message('Некорректно указан url'),//eslint-disable-line
+    avatar: Joi.string().pattern(UrlPicture).message('Некорректно указан url'),//eslint-disable-line
   }),
 }), createUser);
-app.get('/cards', getCards);
 app.use(auth);
 app.all('/', () => {
   throw new NotFoundError('Запрашиваемые данные отсутствуют');
