@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { celebrate, Joi } from 'celebrate';
 import cardsRouter from './routes/cards';
@@ -12,16 +12,9 @@ import {
   createUser,
   login,
 } from './controllers/users';
-import {
-  getCards,
-} from './controllers/cards';
+import { UrlPicture } from './constants/RegularConst';
 
 const { PORT = 3000 } = process.env;
-export interface SessionRequest extends Request {
-  user?: {
-    _id: string;
-  }
-}
 mongoose.connect('mongodb://localhost:27017/mestodb');
 const app = express();
 app.use(express.json());
@@ -40,10 +33,9 @@ app.post('/signup', celebrate({
       .message('Некоректный пароль'),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/).message('Некорректно указан url'),//eslint-disable-line
+    avatar: Joi.string().pattern(UrlPicture).message('Некорректно указан url'),//eslint-disable-line
   }),
 }), createUser);
-app.get('/cards', getCards);
 app.use(auth);
 app.all('/', () => {
   throw new NotFoundError('Запрашиваемые данные отсутствуют');
@@ -55,6 +47,7 @@ app.use((
   err: IError,
   req: Request,
   res: Response,
+  next: NextFunction,
 ) => {
   const { statusCode = UNKNOWN_ERROR, message } = err;
   res.status(statusCode).send({
@@ -62,6 +55,7 @@ app.use((
       ? 'На сервере произошла ошибка'
       : message,
   });
+  next(message);
 });
 
 app.listen(PORT, () => {
