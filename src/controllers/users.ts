@@ -5,6 +5,7 @@ import User from '../models/user';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
 import AutchErr from '../errors/autchErr';
+import { SessionRequest } from '../types/request';
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => User.find({})
   .then((user) => res.send({ user }))
@@ -49,10 +50,10 @@ export const findUser = (req: Request, res: Response, next: NextFunction) => {
 
     .catch(next);
 };
-export const updateUser = (req: any, res: Response, next: NextFunction) => {
+export const updateUser = (req: SessionRequest, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user?._id,
     {
       name,
       about,
@@ -70,16 +71,16 @@ export const updateUser = (req: any, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Неправильный id');
+        throw new NotFoundError('Неправильный id');
       }
       return next(err);
     })
     .catch(next);
 };
-export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
+export const updateAvatar = (req: SessionRequest, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user?._id,
     {
       avatar,
     },
@@ -96,7 +97,7 @@ export const updateAvatar = (req: any, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Неправильный id');
+        throw new NotFoundError('Неправильный id');
       }
       return next(err);
     })
@@ -126,14 +127,11 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
         ),
       });
     })
-    .catch((err) => {
-      throw new AutchErr(err.message);
-    })
     .catch(next);
 };
 
-export const getUser = (req: any, res: Response, next: NextFunction) => {
-  User.findById(req.user._id)
+export const getUser = (req: SessionRequest, res: Response, next: NextFunction) => {
+  User.findById(req.user?._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
@@ -142,7 +140,7 @@ export const getUser = (req: any, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Неправильный id');
+        throw new NotFoundError('Неправильный id');
       }
       return next(err);
     })

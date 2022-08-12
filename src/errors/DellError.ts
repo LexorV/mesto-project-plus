@@ -1,7 +1,7 @@
 import { IErrorClass } from '../types/errors';
 import { CONFLICT_DEL_CARDS } from '../constants/ErrorCode';
 
-class ConflictDelError extends Error implements IErrorClass {
+class DellError extends Error implements IErrorClass {
   statusCode:number;
 
   constructor(message:string) {
@@ -10,4 +10,4 @@ class ConflictDelError extends Error implements IErrorClass {
   }
 }
 
-export default ConflictDelError;
+export default DellError;
