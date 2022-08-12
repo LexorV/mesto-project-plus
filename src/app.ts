@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { celebrate, Joi } from 'celebrate';
 import cardsRouter from './routes/cards';
@@ -55,6 +55,7 @@ app.use((
   err: IError,
   req: Request,
   res: Response,
+  next: NextFunction,
 ) => {
   const { statusCode = UNKNOWN_ERROR, message } = err;
   res.status(statusCode).send({
@@ -62,6 +63,7 @@ app.use((
       ? 'На сервере произошла ошибка'
       : message,
   });
+  next(message);
 });
 
 app.listen(PORT, () => {
