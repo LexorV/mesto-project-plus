@@ -14,14 +14,13 @@ export const createCard = (req: any, res: Response, next: NextFunction) => {
     link,
     owner: req.user._id,
   })
+    .then((card) => res.send({ card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Неправильно заполнено поле');
       }
       return next(err);
-    })
-    .then((card) => res.send({ card }))
-    .catch(next);
+    });
 };
 export const deleteCard = (req: any, res: Response, next: NextFunction) => {
   Card.findById(req.params.cardId)
@@ -32,19 +31,15 @@ export const deleteCard = (req: any, res: Response, next: NextFunction) => {
       if (String(card.owner) !== req.user._id) {
         throw new ConflictDelError('Нельзя удалять чужие карточки');
       } else {
-        return Card.findByIdAndRemove(req.params.cardId)
-          .then((c) => {
-            res.send(c);
-          });
+        card.remove();
+        res.send('Карточка удалена');
       }
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         throw new BadRequestError('Неправильный id карточки');
-      }
-      return next(err);
-    })
-    .catch(next);
+      } else return next(err);
+    });
 };
 export const likeCard = (req: any, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
