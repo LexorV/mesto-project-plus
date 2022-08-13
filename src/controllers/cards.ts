@@ -32,12 +32,14 @@ export const deleteCard = (req: SessionRequest, res: Response, next: NextFunctio
       if (String(card.owner) !== req.user?._id) {
         throw new DellError('Нельзя удалять чужие карточки');
       } else {
-        card.remove();
-        res.send('Карточка удалена');
+        card.remove().then((c) => {
+          res.send(`Карточка удалена ${c}`);
+        })
+          .catch((err) => next(err));
       }
     })
     .catch((err) => {
-      if (err.kind === 'ObjectId') {
+      if (err.name === 'Validation failed') {
         throw new BadRequestError('Неправильный id карточки');
       } else return next(err);
     });
