@@ -39,7 +39,7 @@ export const deleteCard = (req: SessionRequest, res: Response, next: NextFunctio
       }
     })
     .catch((err) => {
-      if (err.name === 'Validation failed') {
+      if (err.name === 'CastError') {
         throw new BadRequestError('Неправильный id карточки');
       } else return next(err);
     });
