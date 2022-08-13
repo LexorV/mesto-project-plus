@@ -6,6 +6,7 @@ import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
 import RepeatedNameError from '../errors/repeatedNameError';
 import { SessionRequest } from '../types/request';
+import AutchErr from '../errors/autchErr';
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => User.find({})
   .then((user) => res.send({ user }))
@@ -44,7 +45,7 @@ export const findUser = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Неправильный id');
+        throw new NotFoundError('Неправильный id');
       }
       return next(err);
     })
@@ -66,7 +67,7 @@ export const updateUser = (req: SessionRequest, res: Response, next: NextFunctio
   )
     .then((user) => {
       if (!user) {
-        throw new BadRequestError('Пользователя не существует');
+        throw new NotFoundError('Пользователя не существует');
       }
       return res.send(user);
     })
@@ -92,7 +93,7 @@ export const updateAvatar = (req: SessionRequest, res: Response, next: NextFunct
   )
     .then((user) => {
       if (!user) {
-        throw new BadRequestError('Пользователя не существует');
+        throw new NotFoundError('Пользователя не существует');
       }
       return res.send(user);
     })
@@ -110,11 +111,11 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new Error('Неправильные почта или пароль');
+        throw new AutchErr('Неправильные почта или пароль');
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          throw new Error('Неправильные почта или пароль');
+          throw new AutchErr('Неправильные почта или пароль');
         }
         return user;
       });
