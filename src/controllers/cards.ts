@@ -69,7 +69,7 @@ export const likeCard = (req: SessionRequest, res: Response, next: NextFunction)
 export const dislikeCard = (req:SessionRequest, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user?._id } },
+    { $pull: { likes: (req as any).user._id } },
     { new: true },
   )
     .then((card) => {
