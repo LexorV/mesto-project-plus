@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { celebrate, Joi } from 'celebrate';
+import cors from 'cors';
 import cardsRouter from './routes/cards';
 import usersRouter from './routes/users';
 import { UNKNOWN_ERROR } from './constants/ErrorCode';
@@ -18,6 +19,9 @@ const { PORT = 3000 } = process.env;
 mongoose.connect('mongodb://localhost:27017/mestodb');
 const app = express();
 app.use(express.json());
+app.use(cors({
+  origin: '*',
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 app.post('/signin', celebrate({
