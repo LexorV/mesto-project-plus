@@ -10,8 +10,7 @@ import {
 import { UrlPicture, IDValid } from '../constants/RegularConst';
 
 const router = Router();
-
-router.get('/cards', getCards);
+router.get('/', getCards);
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
